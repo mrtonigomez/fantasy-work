@@ -8,6 +8,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Scrapping {
 
@@ -24,17 +26,18 @@ public class Scrapping {
                 Document document = getHtmlDocument(url);
 
                 // Busco todas las historias de meneame que estan dentro de:
-                Elements entradas = document.select("//*[@id=\"Form1\"]/div[4]/main/section[1]/ul");
+                Elements conferencias = document.getElementsByClass("eqlist");
 
                 // Paseo cada una de las entradas
-                for (Element elem : entradas) {
-                    String titulo = elem.getElementsByClass("tituloPost").text();
-                    String autor = elem.getElementsByClass("autor").toString();
-                    String fecha = elem.getElementsByClass("fecha").text();
+                Elements equipos = conferencias.get(0).getElementsByAttribute("title");
 
-                    System.out.println(titulo+"\n"+autor+"\n"+fecha+"\n");
+                List<String> urlEquipos = new ArrayList<>();
 
+                for (int i = 0; i < equipos.size(); i++) {
+                    urlEquipos.add(equipos.get(i).attr("href"));
                 }
+
+                System.out.println(urlEquipos);
 
             }else{
                 System.out.println("El Status Code no es OK es: "+getStatusConnectionCode(url));

@@ -1,5 +1,8 @@
 package com.example.scrapping.service;
 
+import com.example.scrapping.Helpers;
+import com.example.scrapping.models.Player;
+import com.example.scrapping.models.Team;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,103 +16,55 @@ import java.util.List;
 @Service
 public class MainService {
 
-    public static final String url = "https://www.basketball-reference.com/teams";
-    private final PlayerStatService service;
+    public static final String urlGetTeams = "https://www.basketball-reference.com/teams";
+    private final PlayerStatService playerStatService;
+    private final PlayerService playerService;
+    private final TeamService teamService;
 
-    public MainService(PlayerStatService service) {
-        this.service = service;
+    public MainService(PlayerStatService playerStatService, PlayerService playerService, TeamService teamService) {
+        this.playerStatService = playerStatService;
+        this.playerService = playerService;
+        this.teamService = teamService;
     }
 
     public void getInfo() {
-        // Compruebo si me da un 200 al hacer la petición
-        if (getStatusConnectionCode(url) == 200) {
 
-            // Obtengo el HTML de la web en un objeto Document2
-            Document document = getHtmlDocument(url);
+        Helpers helper = new Helpers();
 
-            // Busco todas las historias de meneame que estan dentro de:
-            Elements teams = document.select("#teams_active > tbody >tr> th > a");
+        // Check if the request return 200 code
+        if (helper.getStatusConnectionCode(urlGetTeams) == 200) {
 
-            List<String> urlEquipos = new ArrayList<>();
+            Document document = helper.getHtmlDocument(urlGetTeams);
+            Elements documentTeams = document.select("#teams_active > tbody >tr> th > a");
 
-            for (int i = 0; i < teams.size(); i++) {
-                urlEquipos.add(teams.get(i).attr("href"));
+            for (int i = 0; i < documentTeams.size(); i++) {
+                Team team = teamService.createTeam(documentTeams.get(i).attr("href"));
 
-                String newUrlTeams = "https://www.basketball-reference.com" + urlEquipos.get(i) + "2023.html";
-                Document documentTeams = getHtmlDocument(newUrlTeams);
+                String urlGetTeam = "https://www.basketball-reference.com" + documentTeams.get(i).attr("href") + "2023.html";
+                Document documentTeam = helper.getHtmlDocument(urlGetTeam);
 
-                Elements players = documentTeams.select("#roster > tbody >tr > td[data-stat$=player] > a");
-                List<String> urlPlayers = new ArrayList<>();
+                Elements players = documentTeam.select("#roster > tbody >tr > td[data-stat$=player] > a");
 
                 for (int j = 0; j < players.size(); j++) {
-                    urlPlayers.add(players.get(j).attr("href"));
 
-                    String newUrlPlayers = "https://www.basketball-reference.com" + urlPlayers.get(i).replace(".html", "") + "/gamelog/2023";
-                    Document documentPlayer = getHtmlDocument(newUrlPlayers);
+                    Player player = playerService.createPlayer(players.get(j).attr("href"), team);
+
+                    String newUrlPlayers = "https://www.basketball-reference.com" + players.get(j).attr("href").replace(".html", "") + "/gamelog/2023";
+                    Document documentPlayer = helper.getHtmlDocument(newUrlPlayers);
 
                     Elements stats = documentPlayer.select("#pgl_basic > tbody > tr");
-
-
-                    service.recolectInfoWeb(stats);
+                    playerStatService.recolectInfoWeb(stats, player);
 
 
                     System.out.println(stats);
                 }
 
-
             }
 
-        }else{
-            System.out.println("El Status Code no es OK es: "+getStatusConnectionCode(url));
+        } else {
+            System.out.println("El Status Code no es OK es: " +  helper.getStatusConnectionCode(urlGetTeams));
         }
     }
 
-    /**
-     * Con esta método compruebo el Status code de la respuesta que recibo al hacer la petición
-     * EJM:
-     * 		200 OK			300 Multiple Choices
-     * 		301 Moved Permanently	305 Use Proxy
-     * 		400 Bad Request		403 Forbidden
-     * 		404 Not Found		500 Internal Server Error
-     * 		502 Bad Gateway		503 Service Unavailable
-     * @param url
-     * @return Status Code
-     */
-    public static int getStatusConnectionCode(String url) {
-
-        Connection.Response response = null;
-
-        try {
-            response = Jsoup.connect(url)
-                    .ignoreContentType(true)
-                    .userAgent("Mozilla/5.0").timeout(100000).ignoreHttpErrors(true).execute();
-        } catch (IOException ex) {
-            System.out.println("Excepción al obtener el Status Code: " + ex.getMessage());
-        }
-        return response.statusCode();
-    }
-
-
-
-
-    /**
-     * Con este método devuelvo un objeto de la clase Document con el contenido del
-     * HTML de la web que me permitirá parsearlo con los métodos de la librelia JSoup
-     * @param url
-     * @return Documento con el HTML
-     */
-    public static Document getHtmlDocument(String url) {
-
-        Document doc = null;
-
-        try {
-            doc = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(100000).get();
-        } catch (IOException ex) {
-            System.out.println("Excepción al obtener el HTML de la página" + ex.getMessage());
-        }
-
-        return doc;
-
-    }
 
 }

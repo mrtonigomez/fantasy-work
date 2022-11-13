@@ -27,7 +27,7 @@ public class PlayerStats {
 
     //game_id
 
-    @Column(name = "name", nullable = false, length = 50)
+    @Column(name = "minutes", nullable = false, length = 50)
     private String minutes;
 
     @Column(name = "points", nullable = false, length = 1)

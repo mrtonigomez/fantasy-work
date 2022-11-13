@@ -1,5 +1,6 @@
 package com.example.scrapping.service;
 
+import com.example.scrapping.models.Player;
 import com.example.scrapping.models.PlayerStats;
 import com.example.scrapping.repository.PlayerStatsRepository;
 import org.jsoup.select.Elements;
@@ -14,7 +15,7 @@ public class PlayerStatService {
         this.repository = repository;
     }
 
-    public void recolectInfoWeb(Elements stats) {
+    public void recolectInfoWeb(Elements stats, Player player) {
 
         for (int i = 0; i < stats.size(); i++) {
 
@@ -27,6 +28,7 @@ public class PlayerStatService {
             playerStats.setBlocks(Integer.parseInt(stats.get(i).select("[data-stat$=blk]").text()));
             playerStats.setSteals(Integer.parseInt(stats.get(i).select("[data-stat$=stl]").text()));
             playerStats.setTurnovers(Integer.parseInt(stats.get(i).select("[data-stat$=tov]").text()));
+            playerStats.setPlayer(player);
 
             this.addPlayerStat(playerStats);
 

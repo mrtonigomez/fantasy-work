@@ -32,20 +32,20 @@ public class Team {
     private List<Player> players;
 
     @OneToMany(mappedBy = "local_team")
-    @JsonProperty("local_team")
-    private List<Game> local_team;
+    @JsonProperty("local_team_games")
+    private List<Game> local_team_games;
 
     @OneToMany(mappedBy = "visitant_team")
-    @JsonProperty("visitant_team")
-    private List<Game> visitant_team;
+    @JsonProperty("visitant_team_games")
+    private List<Game> visitant_team_games;
 
     @OneToMany(mappedBy = "loser_team_id")
-    @JsonProperty("loser_team_id")
-    private List<Game> loser_team_id;
+    @JsonProperty("loser_team_games")
+    private List<Game> loser_team_games;
 
 
     @OneToMany(mappedBy = "winner_team_id")
-    @JsonProperty("winner_team_id")
-    private List<Game> winner_team_id;
+    @JsonProperty("winner_team_games")
+    private List<Game> winner_team_games;
 
 }

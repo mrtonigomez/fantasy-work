@@ -55,15 +55,13 @@ public class MainService {
                     Elements stats = documentPlayer.select("#pgl_basic > tbody > tr");
                     playerStatService.recolectInfoWeb(stats, player);
 
-                    System.out.println("Hola, esperando dos segundos ...");
-                    Thread.sleep(1000);
+                    System.out.println("Hola, esperando cinco segundos ...");
+                    Thread.sleep(5000);
                     System.out.println("Ya volví de esperar");
                 }
-
             }
-
         } else {
-            System.out.println("El Status Code no es OK es: " +  helper.getStatusConnectionCode(urlGetTeams));
+            System.out.println("El Status Code no es OK es: " + helper.getStatusConnectionCode(urlGetTeams));
         }
     }
 

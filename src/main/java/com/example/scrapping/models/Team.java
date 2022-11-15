@@ -31,4 +31,21 @@ public class Team {
     @JsonProperty("player")
     private List<Player> players;
 
+    @OneToMany(mappedBy = "local_team")
+    @JsonProperty("local_team")
+    private List<Game> local_team;
+
+    @OneToMany(mappedBy = "visitant_team")
+    @JsonProperty("visitant_team")
+    private List<Game> visitant_team;
+
+    @OneToMany(mappedBy = "loser_team_id")
+    @JsonProperty("loser_team_id")
+    private List<Game> loser_team_id;
+
+
+    @OneToMany(mappedBy = "winner_team_id")
+    @JsonProperty("winner_team_id")
+    private List<Game> winner_team_id;
+
 }

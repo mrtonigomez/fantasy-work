@@ -55,28 +55,34 @@ public class PlayerService {
 
     public float calculatePrice(Elements elements) {
 
-        boolean allStar = elements.select("th:first-child > span.sr_star").size() == 1;
-        float ppg = Float.parseFloat(elements.select("td[data-stat$=pts_per_g]").text());
         float price = 0F;
 
-        if (ppg < 5f) {
-            price = 4000000f;
-        } else if (ppg > 5f && ppg < 10f) {
-            price = 10000000f;
-        } else if (ppg > 10f && ppg < 15f) {
-            price = 15000000f;
-        } else if (ppg > 15f && ppg < 20f) {
-            price = 20000000f;
-        } else if (ppg > 20f && ppg < 25f) {
-            price = 30000000f;
-        } else if (ppg > 25f && ppg < 30f) {
-            price = 40000000f;
-        } else if (ppg > 30f) {
-            price = 50000000f;
-        }
+        //Comprobar si hay registros de la temporada pasada. Sino, es un rookie y el price es el minimo
+        if (!elements.select("td[data-stat$=pts_per_g]").isEmpty()){
+            boolean allStar = elements.select("th:first-child > span.sr_star").size() == 1;
+            float ppg = Float.parseFloat(elements.select("td[data-stat$=pts_per_g]").text());
 
-        if (allStar) {
-            price += 5000000;
+            if (ppg < 5f) {
+                price = 5000000f;
+            } else if (ppg > 5f && ppg < 10f) {
+                price = 10000000f;
+            } else if (ppg > 10f && ppg < 15f) {
+                price = 15000000f;
+            } else if (ppg > 15f && ppg < 20f) {
+                price = 20000000f;
+            } else if (ppg > 20f && ppg < 25f) {
+                price = 30000000f;
+            } else if (ppg > 25f && ppg < 30f) {
+                price = 40000000f;
+            } else if (ppg > 30f) {
+                price = 50000000f;
+            }
+
+            if (allStar) {
+                price += 5000000;
+            }
+        }else {
+            price = 5000000f;
         }
 
         return price;

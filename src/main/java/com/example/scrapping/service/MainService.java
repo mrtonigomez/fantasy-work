@@ -27,7 +27,7 @@ public class MainService {
         this.teamService = teamService;
     }
 
-    public void getInfo() {
+    public void getInfo() throws InterruptedException {
 
         Helpers helper = new Helpers();
 
@@ -55,8 +55,9 @@ public class MainService {
                     Elements stats = documentPlayer.select("#pgl_basic > tbody > tr");
                     playerStatService.recolectInfoWeb(stats, player);
 
-
-                    System.out.println(stats);
+                    System.out.println("Hola, esperando dos segundos ...");
+                    Thread.sleep(1000);
+                    System.out.println("Ya volví de esperar");
                 }
 
             }

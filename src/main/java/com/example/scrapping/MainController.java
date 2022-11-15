@@ -17,7 +17,7 @@ public class MainController {
     MainService service;
 
     @GetMapping("/get-info")
-    public void getInfo(){
+    public void getInfo() throws InterruptedException {
         service.getInfo();
 
     }

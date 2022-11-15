@@ -22,6 +22,7 @@ public class PlayerStatService {
             if (!stats.get(i).select("[data-stat$=pts]").isEmpty()) {
 
                 PlayerStats playerStats = new PlayerStats();
+
                 playerStats.setPoints(Integer.parseInt(stats.get(i).select("[data-stat$=pts]").text()));
                 playerStats.setMinutes(stats.get(i).select("[data-stat$=mp]").text());
                 playerStats.setAssists(Integer.parseInt(stats.get(i).select("[data-stat$=ast]").text()));
@@ -30,6 +31,16 @@ public class PlayerStatService {
                 playerStats.setBlocks(Integer.parseInt(stats.get(i).select("[data-stat$=blk]").text()));
                 playerStats.setSteals(Integer.parseInt(stats.get(i).select("[data-stat$=stl]").text()));
                 playerStats.setTurnovers(Integer.parseInt(stats.get(i).select("[data-stat$=tov]").text()));
+
+                playerStats.setFgm(Integer.parseInt(stats.get(i).select("[data-stat$=fg]").text()));
+                playerStats.setFga(Integer.parseInt(stats.get(i).select("[data-stat$=fga]").text()));
+
+                playerStats.setFg3m(Integer.parseInt(stats.get(i).select("[data-stat$=fg3]").text()));
+                playerStats.setFg3a(Integer.parseInt(stats.get(i).select("[data-stat$=fg3a]").text()));
+
+                playerStats.setFtm(Integer.parseInt(stats.get(i).select("[data-stat$=ft]").text()));
+                playerStats.setFta(Integer.parseInt(stats.get(i).select("[data-stat$=fta]").text()));
+
                 playerStats.setPlayer(player);
 
                 this.addPlayerStat(playerStats);

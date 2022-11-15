@@ -22,10 +22,14 @@ public class PlayerStats {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "player_id", nullable = true)
-    @JsonProperty("user")
+    @JsonProperty("player")
     private Player player;
 
-    //game_id
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "game_id", nullable = true)
+    @JsonProperty("game_id")
+    private Game game;
 
     @Column(name = "minutes", nullable = false, length = 50)
     private String minutes;
@@ -47,6 +51,24 @@ public class PlayerStats {
 
     @Column(name = "turnovers", nullable = false, length = 50)
     private int turnovers;
+
+    @Column(name = "fgm", nullable = false, length = 50)
+    private int fgm;
+
+    @Column(name = "fga", nullable = false, length = 50)
+    private int fga;
+
+    @Column(name = "fg3m", nullable = false, length = 50)
+    private int fg3m;
+
+    @Column(name = "fg3a", nullable = false, length = 50)
+    private int fg3a;
+
+    @Column(name = "ftm", nullable = false, length = 50)
+    private int ftm;
+
+    @Column(name = "fta", nullable = false, length = 50)
+    private int fta;
 
     @Column(name = "foults", nullable = false, length = 50)
     private int foults;

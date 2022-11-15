@@ -8,6 +8,7 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -19,7 +20,7 @@ public class TeamService {
         this.repository = repository;
     }
 
-    public Team createTeam(String url) {
+    public void createTeam(String url) {
 
         Helpers helper = new Helpers();
         Team team = new Team();
@@ -29,10 +30,17 @@ public class TeamService {
         Map<String, String> dataInfo = this.getBasicData(documentTeam);
 
         team.setName(dataInfo.get("name"));
-        team.setChampionships(Integer.parseInt(dataInfo.get("championships")));
+        team.setChampionships(dataInfo.get("championships"));
         team.setLocation(dataInfo.get("location"));
 
-        return this.addTeam(team);
+        if (url.split("/")[2].equals("NJN")) {
+            team.setAbrv("BRK");
+        } else {
+            team.setAbrv(url.split("/")[2]);
+        }
+
+
+        this.addTeam(team);
 
     }
 
@@ -41,7 +49,7 @@ public class TeamService {
         Map<String, String> dataInfo = new HashMap<>();
         dataInfo.put("name", documentTeam.select("#meta > div:last-child > h1 > span:first-child").text());
         dataInfo.put("location", documentTeam.select("#meta > div:last-child > p:contains(location)").text().substring(10));
-        dataInfo.put("championships", documentTeam.select("#meta > div:last-child > p:contains(championships)").text().substring(15));
+        dataInfo.put("championships", documentTeam.select("#meta > div:last-child > p:contains(championships)").text().substring(15).trim());
 
         return dataInfo;
 
@@ -49,6 +57,14 @@ public class TeamService {
 
     public Team addTeam(Team team) {
         return repository.save(team);
+    }
+
+    public Team getTeamByCode(String abrv) {
+        return repository.findByAbrv(abrv);
+    }
+
+    public List<Team> getAllTeams() {
+        return repository.findAll();
     }
 
 }

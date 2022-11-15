@@ -7,6 +7,8 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -20,8 +22,8 @@ public class Game {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "game_date", nullable = false, length = 100)
-    private String game_date;
+    @Column(name = "date", nullable = false, length = 100)
+    private Date date;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)

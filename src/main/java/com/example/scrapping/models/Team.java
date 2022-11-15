@@ -21,11 +21,14 @@ public class Team {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
+    @Column(name = "abrv", nullable = false, length = 100)
+    private String abrv;
+
     @Column(name = "location", nullable = false, length = 100)
     private String location;
 
     @Column(name = "championships", nullable = false, length = 50)
-    private float championships;
+    private String championships;
 
     @OneToMany(mappedBy = "team")
     @JsonProperty("player")

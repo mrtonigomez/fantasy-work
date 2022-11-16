@@ -49,21 +49,18 @@ public class MainService {
                 Elements players = documentTeam.select("#roster > tbody >tr > td[data-stat$=player] > a");
 
                 for (int j = 0; j < players.size(); j++) {
-                    String uriPlayer = players.get(j).attr("href");
-                    Player player = playerService.insertPlayerData(uriPlayer, teams.get(i));
+                    String urlPlayer = "https://www.basketball-reference.com" + players.get(j).attr("href");
+                    Team team = teams.get(i);
+                    Player player = playerService.insertPlayerData(urlPlayer, team);
 
-                    String newUrlPlayers = "https://www.basketball-reference.com" + players.get(j).attr("href").replace(".html", "") + "/gamelog/2023";
-                    Document documentPlayer = helper.getHtmlDocument(newUrlPlayers);
-
-                    Elements stats = documentPlayer.select("#pgl_basic > tbody > tr");
-                    playerStatService.insertPlayerStatsData(stats, player, gameService, teamService);
+                    String urlPlayerLatestStats = "https://www.basketball-reference.com" + players.get(j).attr("href").replace(".html", "") + "/gamelog/2023";
+                    playerStatService.insertPlayerStatsData(urlPlayerLatestStats, player);
 
                     System.out.println("Hola, esperando cinco segundos ...");
                     Thread.sleep(5000);
                     System.out.println("Ya volví de esperar");
                 }
             }
-
         } else {
             System.out.println("El Status Code no es OK es: " + helper.getStatusConnectionCode(urlGetTeams));
         }

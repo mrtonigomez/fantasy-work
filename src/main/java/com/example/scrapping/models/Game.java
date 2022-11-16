@@ -41,18 +41,18 @@ public class Game {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "winner_team_id", nullable = true)
     @JsonProperty("winner_team_id")
-    private Team winner_team_id;
+    private Team winner_team;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "loser_team_id", nullable = true)
     @JsonProperty("loser_team_id")
-    private Team loser_team_id;
+    private Team loser_team;
 
-    @Column(name = "point_team_local", nullable = false, length = 100)
-    private String point_team_local;
+    @Column(name = "points_team_local", nullable = true, length = 100)
+    private String points_team_local;
 
-    @Column(name = "point_team_visitant", nullable = false, length = 100)
-    private String point_team_visitant;
+    @Column(name = "points_team_visitant", nullable = true, length = 100)
+    private String points_team_visitant;
 
 }

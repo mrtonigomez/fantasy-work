@@ -42,12 +42,11 @@ public class Team {
     @JsonProperty("visitant_team_games")
     private List<Game> visitant_team_games;
 
-    @OneToMany(mappedBy = "loser_team_id")
+    @OneToMany(mappedBy = "loser_team")
     @JsonProperty("loser_team_games")
     private List<Game> loser_team_games;
 
-
-    @OneToMany(mappedBy = "winner_team_id")
+    @OneToMany(mappedBy = "winner_team")
     @JsonProperty("winner_team_games")
     private List<Game> winner_team_games;
 

@@ -21,21 +21,20 @@ public class PlayerService {
         this.repository = repository;
     }
 
-    public Player insertPlayerData(String url, Team team) {
+    public Player insertPlayerData(String urlPlayer, Team team) {
+
+        if (this.getPlayerByUrl(urlPlayer) != null) {
+            return this.getPlayerByUrl(urlPlayer);
+        }
 
         Helpers helper = new Helpers();
         Player player = new Player();
 
-        String urlPlayer = "https://www.basketball-reference.com" + url;
-
-        if (this.getPlayerByUrl(urlPlayer) != null) {
-            return this.getPlayerByName(urlPlayer);
-        }
-
         Document documentPlayer = helper.getHtmlDocument(urlPlayer);
-        Map<String, String> dataInfo = this.getBasicData(documentPlayer);
 
+        Map<String, String> dataInfo = this.getBasicData(documentPlayer);
         int rowToSearch = documentPlayer.select("#per_game > tbody > tr").size() - 1;
+
         Elements elements = documentPlayer.select("#per_game > tbody > tr:nth-child(" + rowToSearch + ")");
         float price = this.calculatePrice(elements);
 
@@ -46,7 +45,6 @@ public class PlayerService {
         player.setTeam(team);
 
         return this.addPlayer(player);
-
     }
 
     public Map<String, String> getBasicData(Document documentPlayer) {
@@ -56,7 +54,6 @@ public class PlayerService {
         dataInfo.put("postion", documentPlayer.select("#per_game > tbody > tr:last-child > td[data-stat$=pos]").text());
 
         return dataInfo;
-
     }
 
     public Player getPlayerByName(String name) {

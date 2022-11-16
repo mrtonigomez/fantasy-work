@@ -20,11 +20,13 @@ public class MainService {
     private final PlayerStatService playerStatService;
     private final PlayerService playerService;
     private final TeamService teamService;
+    private final GameService gameService;
 
-    public MainService(PlayerStatService playerStatService, PlayerService playerService, TeamService teamService) {
+    public MainService(PlayerStatService playerStatService, PlayerService playerService, TeamService teamService, GameService gameService) {
         this.playerStatService = playerStatService;
         this.playerService = playerService;
         this.teamService = teamService;
+        this.gameService = gameService;
     }
 
     public void getInfo() throws InterruptedException {
@@ -37,9 +39,8 @@ public class MainService {
             List<Team> teams = teamService.getAllTeams();
 
             if (teams.isEmpty()) {
-                this.insertTeamData(helper);
+                teams = this.insertTeamData(helper);
             }
-
 
             for (int i = 0; i < teams.size(); i++) {
                 String urlGetTeam = "https://www.basketball-reference.com/teams/" + teams.get(i).getAbrv() + "/2023.html";
@@ -48,16 +49,14 @@ public class MainService {
                 Elements players = documentTeam.select("#roster > tbody >tr > td[data-stat$=player] > a");
 
                 for (int j = 0; j < players.size(); j++) {
-
-                    Team team = teamService.getTeamByCode(teams.get(i).getAbrv());
-
-                    Player player = playerService.createPlayer(players.get(j).attr("href"), team);
+                    String uriPlayer = players.get(j).attr("href");
+                    Player player = playerService.insertPlayerData(uriPlayer, teams.get(i));
 
                     String newUrlPlayers = "https://www.basketball-reference.com" + players.get(j).attr("href").replace(".html", "") + "/gamelog/2023";
                     Document documentPlayer = helper.getHtmlDocument(newUrlPlayers);
 
                     Elements stats = documentPlayer.select("#pgl_basic > tbody > tr");
-                    playerStatService.recolectInfoWeb(stats, player);
+                    playerStatService.insertPlayerStatsData(stats, player, gameService, teamService);
 
                     System.out.println("Hola, esperando cinco segundos ...");
                     Thread.sleep(5000);
@@ -70,7 +69,7 @@ public class MainService {
         }
     }
 
-    public void insertTeamData(Helpers helper) throws InterruptedException {
+    public List<Team> insertTeamData(Helpers helper) throws InterruptedException {
 
         Document document = helper.getHtmlDocument(this.urlGetTeams);
         Elements documentTeams = document.select("#teams_active > tbody >tr> th > a");
@@ -82,6 +81,8 @@ public class MainService {
             Thread.sleep(5000);
             System.out.println("Ya volví de esperar");
         }
+
+        return teamService.getAllTeams();
     }
 
 

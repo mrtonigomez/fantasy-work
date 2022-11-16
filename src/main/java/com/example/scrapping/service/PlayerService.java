@@ -21,12 +21,17 @@ public class PlayerService {
         this.repository = repository;
     }
 
-    public Player createPlayer(String url, Team team) {
+    public Player insertPlayerData(String url, Team team) {
 
         Helpers helper = new Helpers();
         Player player = new Player();
 
         String urlPlayer = "https://www.basketball-reference.com" + url;
+
+        if (this.getPlayerByUrl(urlPlayer) != null) {
+            return this.getPlayerByName(urlPlayer);
+        }
+
         Document documentPlayer = helper.getHtmlDocument(urlPlayer);
         Map<String, String> dataInfo = this.getBasicData(documentPlayer);
 
@@ -37,6 +42,7 @@ public class PlayerService {
         player.setName(dataInfo.get("name"));
         player.setPostion(dataInfo.get("postion"));
         player.setPrice(price);
+        player.setUrl(urlPlayer);
         player.setTeam(team);
 
         return this.addPlayer(player);
@@ -51,6 +57,14 @@ public class PlayerService {
 
         return dataInfo;
 
+    }
+
+    public Player getPlayerByName(String name) {
+        return repository.findByName(name);
+    }
+
+    public Player getPlayerByUrl(String url) {
+        return repository.findByUrl(url);
     }
 
     public float calculatePrice(Elements elements) {

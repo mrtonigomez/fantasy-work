@@ -1,10 +1,17 @@
 package com.example.scrapping.service;
 
+import com.example.scrapping.models.Game;
 import com.example.scrapping.models.Player;
 import com.example.scrapping.models.PlayerStats;
+import com.example.scrapping.models.Team;
 import com.example.scrapping.repository.PlayerStatsRepository;
+import lombok.SneakyThrows;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Service
 public class PlayerStatService {
@@ -15,7 +22,8 @@ public class PlayerStatService {
         this.repository = repository;
     }
 
-    public void recolectInfoWeb(Elements stats, Player player) {
+    @SneakyThrows
+    public void insertPlayerStatsData(Elements stats, Player player, GameService gameService, TeamService teamService) {
 
         for (int i = 0; i < stats.size(); i++) {
 
@@ -43,6 +51,21 @@ public class PlayerStatService {
 
                 playerStats.setPlayer(player);
 
+                Game game = new Game();
+
+                Date date = new SimpleDateFormat("yyyy-MM-dd").parse(stats.get(i).select("[data-stat$=date_game]").text());
+                game.setDate(date);
+
+                Team team_id = teamService.getTeamByCode(stats.get(i).select("[data-stat$=team_id]").text());
+                Team opp_id = teamService.getTeamByCode(stats.get(i).select("[data-stat$=opp_id]").text());
+
+                if (stats.get(i).select("[data-stat$=game_location]").text().equals("@")){
+                    game = this.setLocalVisitantTeams(game, opp_id, team_id);
+                }else {
+                    game = this.setLocalVisitantTeams(game, team_id, opp_id);
+                }
+                playerStats.setGame(gameService.insertGame(game));
+
                 this.addPlayerStat(playerStats);
             }
 
@@ -51,6 +74,13 @@ public class PlayerStatService {
 
     public void addPlayerStat(PlayerStats playerStats) {
         repository.save(playerStats);
+    }
+
+    public Game setLocalVisitantTeams(Game game, Team local, Team visitant) {
+        game.setVisitant_team(visitant);
+        game.setLocal_team(local);
+
+        return game;
     }
 
 }

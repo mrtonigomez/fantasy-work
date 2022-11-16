@@ -29,6 +29,9 @@ public class Player {
     @Column(name = "price", nullable = false, length = 50)
     private float price;
 
+    @Column(name = "url", nullable = false, length = 150)
+    private String url;
+
     @OneToMany(mappedBy = "player")
     @JsonProperty("player_stats")
     private List<PlayerStats> playerStatsList;

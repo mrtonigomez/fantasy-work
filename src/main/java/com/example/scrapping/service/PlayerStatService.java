@@ -86,6 +86,7 @@ public class PlayerStatService {
     }
 
     public void createOrGetPlayerStat(Element stats, Player player, Game game) {
+
         PlayerStats playerStats = new PlayerStats();
 
         playerStats.setPoints(Integer.parseInt(stats.select("[data-stat$=pts]").text()));
@@ -108,8 +109,23 @@ public class PlayerStatService {
 
         playerStats.setPlayer(player);
         playerStats.setGame(game);
+        playerStats.setRating(this.calculateRating(playerStats));
 
         this.addPlayerStat(playerStats);
+    }
+
+    public Integer calculateRating(PlayerStats playerStat) {
+        int rating = 0;
+
+        int pointsWin = (playerStat.getFgm() * 2) + (playerStat.getAssists() * 2) + (playerStat.getRebounds() * 2) +
+                (playerStat.getBlocks()) + (playerStat.getSteals()) + (playerStat.getFtm());
+
+        int pointsLose = ((playerStat.getFga() - playerStat.getFgm()) * 2) + (playerStat.getFoults() * 2) +
+                (playerStat.getTurnovers() * 2) + (playerStat.getFta() - playerStat.getFtm());
+
+        rating = pointsWin - pointsLose;
+
+        return rating;
     }
 
 }

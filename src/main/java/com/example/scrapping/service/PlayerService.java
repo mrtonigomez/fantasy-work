@@ -2,7 +2,6 @@ package com.example.scrapping.service;
 
 import com.example.scrapping.Helpers;
 import com.example.scrapping.models.Player;
-import com.example.scrapping.models.PlayerStats;
 import com.example.scrapping.models.Team;
 import com.example.scrapping.repository.PlayerRepository;
 import org.jsoup.nodes.Document;
@@ -15,19 +14,20 @@ import java.util.Map;
 @Service
 public class PlayerService {
 
-    private PlayerRepository repository;
+    private final PlayerRepository repository;
+    private final Helpers helper;
 
-    public PlayerService(PlayerRepository repository) {
+    public PlayerService(PlayerRepository repository, Helpers helper) {
         this.repository = repository;
+        this.helper = helper;
     }
 
-    public Player insertPlayerData(String urlPlayer, Team team) {
+    public Player insertOrGetPlayerData(String urlPlayer, Team team) {
 
         if (this.getPlayerByUrl(urlPlayer) != null) {
             return this.getPlayerByUrl(urlPlayer);
         }
 
-        Helpers helper = new Helpers();
         Player player = new Player();
 
         Document documentPlayer = helper.getHtmlDocument(urlPlayer);

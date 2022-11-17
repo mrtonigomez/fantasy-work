@@ -3,14 +3,11 @@ package com.example.scrapping.service;
 import com.example.scrapping.Helpers;
 import com.example.scrapping.models.Player;
 import com.example.scrapping.models.Team;
-import org.jsoup.Connection;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,58 +18,42 @@ public class MainService {
     private final PlayerService playerService;
     private final TeamService teamService;
     private final GameService gameService;
+    private final Helpers helper;
 
-    public MainService(PlayerStatService playerStatService, PlayerService playerService, TeamService teamService, GameService gameService) {
+    public MainService(PlayerStatService playerStatService, PlayerService playerService, TeamService teamService, GameService gameService, Helpers helper) {
         this.playerStatService = playerStatService;
         this.playerService = playerService;
         this.teamService = teamService;
         this.gameService = gameService;
+        this.helper = helper;
     }
 
     public void getInfo() throws InterruptedException {
-
-        Helpers helper = new Helpers();
-
         // Check if the request return 200 code
         if (helper.getStatusConnectionCode(this.urlGetTeams) == 200) {
 
             List<Team> teams = teamService.getAllTeams();
 
             if (teams.isEmpty()) {
-                teams = this.insertTeamData(helper);
+                teams = this.insertTeamData();
             }
 
-            for (int i = 0; i < teams.size(); i++) {
-                String urlGetTeam = "https://www.basketball-reference.com/teams/" + teams.get(i).getAbrv() + "/2023.html";
-                Document documentTeam = helper.getHtmlDocument(urlGetTeam);
-
-                Elements players = documentTeam.select("#roster > tbody >tr > td[data-stat$=player] > a");
-
-                for (int j = 0; j < players.size(); j++) {
-                    String urlPlayer = "https://www.basketball-reference.com" + players.get(j).attr("href");
-                    Team team = teams.get(i);
-                    Player player = playerService.insertPlayerData(urlPlayer, team);
-
-                    String urlPlayerLatestStats = "https://www.basketball-reference.com" + players.get(j).attr("href").replace(".html", "") + "/gamelog/2023";
-                    playerStatService.insertPlayerStatsData(urlPlayerLatestStats, player);
-
-                    System.out.println("Hola, esperando cinco segundos ...");
-                    Thread.sleep(5000);
-                    System.out.println("Ya volví de esperar");
-                }
+            for (Team team : teams) {
+                this.insertPlayerData(team);
             }
+
         } else {
             System.out.println("El Status Code no es OK es: " + helper.getStatusConnectionCode(urlGetTeams));
         }
     }
 
-    public List<Team> insertTeamData(Helpers helper) throws InterruptedException {
+    public List<Team> insertTeamData() throws InterruptedException {
 
         Document document = helper.getHtmlDocument(this.urlGetTeams);
         Elements documentTeams = document.select("#teams_active > tbody >tr> th > a");
 
-        for (int i = 0; i < documentTeams.size(); i++) {
-            teamService.createTeam(documentTeams.get(i).attr("href"));
+        for (Element documentTeam : documentTeams) {
+            teamService.createTeam(documentTeam.attr("href"));
 
             System.out.println("Hola, esperando cinco segundos ...");
             Thread.sleep(5000);
@@ -80,6 +61,30 @@ public class MainService {
         }
 
         return teamService.getAllTeams();
+    }
+
+    public void insertPlayerData(Team team) {
+        String urlGetTeam = "https://www.basketball-reference.com/teams/" + team.getAbrv() + "/2023.html";
+        Document documentTeam = helper.getHtmlDocument(urlGetTeam);
+
+        Elements playersDocument = documentTeam.select("#roster > tbody >tr > td[data-stat$=player] > a");
+
+        playersDocument.forEach(playerDocument -> {
+            String urlPlayer = "https://www.basketball-reference.com" + playerDocument.attr("href");
+            Player player = playerService.insertOrGetPlayerData(urlPlayer, team);
+
+            String urlPlayerLatestStats = "https://www.basketball-reference.com" + playerDocument.attr("href").replace(".html", "") + "/gamelog/2023";
+            playerStatService.insertPlayerStatsData(urlPlayerLatestStats, player);
+
+            System.out.println("Hola, esperando cinco segundos ...");
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("Ya volví de esperar");
+        });
+
     }
 
 

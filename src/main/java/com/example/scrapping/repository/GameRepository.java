@@ -14,7 +14,6 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 
     public Game findByDate(Timestamp date);
 
-    /*@Query(nativeQuery = true, value = "SELECT * FROM game where ")
-    Game findByVisitant_team(Long teamVisitantId);*/
+    Game findByVisitantTeamIdAndLocalTeamIdAndDate(Team visitant_team, Team local_team, Timestamp date);
 
 }

@@ -21,72 +21,26 @@ import java.util.Date;
 public class PlayerStatService {
 
     protected final PlayerStatsRepository repository;
-    protected final GameService gameService;
-    protected final TeamService teamService;
+    protected final Helpers helper;
 
-    public PlayerStatService(PlayerStatsRepository repository, GameService gameService, TeamService teamService) {
+    public PlayerStatService(PlayerStatsRepository repository, Helpers helper) {
         this.repository = repository;
-        this.gameService = gameService;
-        this.teamService = teamService;
+        this.helper = helper;
     }
 
     @SneakyThrows
-    public void insertPlayerStatsData(String newUrlPlayers, Player player) {
+    public void insertPlayerStatsData(Element statGame, Player player, Game game) {
+        if (!statGame.select("[data-stat$=pts]").isEmpty()) {
 
-        //Validacion de player stat y game
-
-        Helpers helper = new Helpers();
-
-        Document documentPlayer = helper.getHtmlDocument(newUrlPlayers);
-        Elements stats = documentPlayer.select("#pgl_basic > tbody > tr");
-
-        for (int i = 0; i < stats.size(); i++) {
-
-            if (!stats.select("[data-stat$=pts]").isEmpty()) {
-
-                Game game = this.createOrGetGame(stats.get(i));
-                this.createOrGetPlayerStat(stats.get(i), player, game);
-
+            if (this.findByPlayerAndGame(player, game) != null) {
+                return;
             }
+            this.createPlayerStat(statGame, player, game);
+
         }
     }
 
-    public void addPlayerStat(PlayerStats playerStats) {
-        repository.save(playerStats);
-    }
-
-    public void getPlayerStatBy(PlayerStats playerStats) {
-        repository.save(playerStats);
-    }
-
-    public Game setLocalVisitantTeams(Game game, Team local, Team visitant) {
-        game.setVisitant_team(visitant);
-        game.setLocal_team(local);
-
-        return game;
-    }
-
-    public Game createOrGetGame(Element stats) throws ParseException {
-        Date date = new SimpleDateFormat("yyyy-MM-dd").parse(stats.select("[data-stat$=date_game]").text());
-        Timestamp dateT = new Timestamp(date.getTime());
-
-        Team team_id = teamService.getTeamByCode(stats.select("[data-stat$=team_id]").text());
-        Team opp_id = teamService.getTeamByCode(stats.select("[data-stat$=opp_id]").text());
-
-        Game game = new Game();
-
-        if (stats.select("[data-stat$=game_location]").text().equals("@")) {
-            game = this.setLocalVisitantTeams(game, opp_id, team_id);
-        } else {
-            game = this.setLocalVisitantTeams(game, team_id, opp_id);
-        }
-
-        game.setDate(dateT);
-        return gameService.insertGame(game);
-    }
-
-    public void createOrGetPlayerStat(Element stats, Player player, Game game) {
-
+    public void createPlayerStat(Element stats, Player player, Game game) {
         PlayerStats playerStats = new PlayerStats();
 
         playerStats.setPoints(Integer.parseInt(stats.select("[data-stat$=pts]").text()));
@@ -126,6 +80,18 @@ public class PlayerStatService {
         rating = pointsWin - pointsLose;
 
         return rating;
+    }
+
+    public void addPlayerStat(PlayerStats playerStats) {
+        repository.save(playerStats);
+    }
+
+    public void getPlayerStatBy(PlayerStats playerStats) {
+        repository.save(playerStats);
+    }
+
+    public PlayerStats findByPlayerAndGame(Player player, Game game){
+        return repository.findByPlayerAndGame(player, game);
     }
 
 }

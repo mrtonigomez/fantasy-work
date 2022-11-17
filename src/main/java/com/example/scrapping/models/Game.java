@@ -29,13 +29,13 @@ public class Game {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "local_team_id", nullable = true)
     @JsonProperty("local_team_id")
-    private Team local_team;
+    private Team localTeamId;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "visitant_team_id", nullable = true)
     @JsonProperty("visitant_team_id")
-    private Team visitant_team;
+    private Team visitantTeamId;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)

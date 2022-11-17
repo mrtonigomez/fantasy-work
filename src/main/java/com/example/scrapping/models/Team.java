@@ -34,11 +34,11 @@ public class Team {
     @JsonProperty("player")
     private List<Player> players;
 
-    @OneToMany(mappedBy = "local_team")
+    @OneToMany(mappedBy = "localTeamId")
     @JsonProperty("local_team_games")
     private List<Game> local_team_games;
 
-    @OneToMany(mappedBy = "visitant_team")
+    @OneToMany(mappedBy = "visitantTeamId")
     @JsonProperty("visitant_team_games")
     private List<Game> visitant_team_games;
 

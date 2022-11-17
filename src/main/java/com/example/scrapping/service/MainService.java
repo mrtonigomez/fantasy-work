@@ -1,6 +1,7 @@
 package com.example.scrapping.service;
 
 import com.example.scrapping.Helpers;
+import com.example.scrapping.models.Game;
 import com.example.scrapping.models.Player;
 import com.example.scrapping.models.Team;
 import org.jsoup.nodes.Document;
@@ -8,23 +9,22 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.util.List;
 
 @Service
 public class MainService {
 
     public final String urlGetTeams = "https://www.basketball-reference.com/teams";
-    private final PlayerStatService playerStatService;
     private final PlayerService playerService;
     private final TeamService teamService;
-    private final GameService gameService;
+    private final InfoStatsService infoStatsService;
     private final Helpers helper;
 
-    public MainService(PlayerStatService playerStatService, PlayerService playerService, TeamService teamService, GameService gameService, Helpers helper) {
-        this.playerStatService = playerStatService;
+    public MainService(PlayerService playerService, TeamService teamService, Helpers helper, InfoStatsService infoStatsService) {
         this.playerService = playerService;
         this.teamService = teamService;
-        this.gameService = gameService;
+        this.infoStatsService = infoStatsService;
         this.helper = helper;
     }
 
@@ -48,7 +48,6 @@ public class MainService {
     }
 
     public List<Team> insertTeamData() throws InterruptedException {
-
         Document document = helper.getHtmlDocument(this.urlGetTeams);
         Elements documentTeams = document.select("#teams_active > tbody >tr> th > a");
 
@@ -66,7 +65,6 @@ public class MainService {
     public void insertPlayerData(Team team) {
         String urlGetTeam = "https://www.basketball-reference.com/teams/" + team.getAbrv() + "/2023.html";
         Document documentTeam = helper.getHtmlDocument(urlGetTeam);
-
         Elements playersDocument = documentTeam.select("#roster > tbody >tr > td[data-stat$=player] > a");
 
         playersDocument.forEach(playerDocument -> {
@@ -74,7 +72,14 @@ public class MainService {
             Player player = playerService.insertOrGetPlayerData(urlPlayer, team);
 
             String urlPlayerLatestStats = "https://www.basketball-reference.com" + playerDocument.attr("href").replace(".html", "") + "/gamelog/2023";
-            playerStatService.insertPlayerStatsData(urlPlayerLatestStats, player);
+            Document documentPlayer = helper.getHtmlDocument(urlPlayerLatestStats);
+            Elements stats = documentPlayer.select("#pgl_basic > tbody > tr");
+
+            try {
+                infoStatsService.recolectInfo(stats, player, teamService);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
             System.out.println("Hola, esperando cinco segundos ...");
             try {

@@ -74,10 +74,14 @@ public class PlayerStatService {
         int pointsWin = (playerStat.getFgm() * 2) + (playerStat.getAssists() * 2) + (playerStat.getRebounds() * 2) +
                 (playerStat.getBlocks()) + (playerStat.getSteals()) + (playerStat.getFtm());
 
-        int pointsLose = ((playerStat.getFga() - playerStat.getFgm()) * 2) + (playerStat.getFoults() * 2) +
-                (playerStat.getTurnovers() * 2) + (playerStat.getFta() - playerStat.getFtm());
+        int pointsLose = ((playerStat.getFga() - playerStat.getFgm()) * 2) + (playerStat.getFoults()) +
+                (playerStat.getTurnovers()) + (playerStat.getFta() - playerStat.getFtm());
 
         rating = pointsWin - pointsLose;
+
+        if (rating <= 5) {
+            return 5;
+        }
 
         return rating;
     }

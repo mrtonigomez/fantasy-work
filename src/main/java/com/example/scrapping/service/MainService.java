@@ -55,7 +55,7 @@ public class MainService {
             teamService.createTeam(documentTeam.attr("href"));
 
             System.out.println("Hola, esperando cinco segundos ...");
-            Thread.sleep(5000);
+            Thread.sleep(3000);
             System.out.println("Ya volví de esperar");
         }
 
@@ -83,7 +83,7 @@ public class MainService {
 
             System.out.println("Hola, esperando cinco segundos ...");
             try {
-                Thread.sleep(5000);
+                Thread.sleep(4000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -75,17 +75,17 @@ public class PlayerService {
 
             if (ppg < 5f) {
                 price = 5000000f;
-            } else if (ppg > 5f && ppg < 10f) {
+            } else if (ppg > 5f && ppg <= 10f) {
                 price = 10000000f;
-            } else if (ppg > 10f && ppg < 15f) {
+            } else if (ppg > 10f && ppg <= 15f) {
                 price = 15000000f;
-            } else if (ppg > 15f && ppg < 20f) {
+            } else if (ppg > 15f && ppg <= 20f) {
                 price = 20000000f;
-            } else if (ppg > 20f && ppg < 25f) {
+            } else if (ppg > 20f && ppg <= 25f) {
                 price = 30000000f;
             } else if (ppg > 25f && ppg < 30f) {
                 price = 40000000f;
-            } else if (ppg > 30f) {
+            } else if (ppg >= 30f) {
                 price = 50000000f;
             }
 

@@ -31,36 +31,24 @@ public class GameService {
         Timestamp dateT = new Timestamp(date.getTime());
         String visitantTeam;
         String localTeam;
+        String team_id;
+        String opp_id;
         Team visitant_team_id;
         Team local_team_id;
 
+        team_id = statsGame.select("[data-stat$=team_id]").text();
+        opp_id = statsGame.select("[data-stat$=opp_id]").text();
+
         if (statsGame.select("[data-stat$=game_location]").text().equals("@")) {
-            visitantTeam = statsGame.select("[data-stat$=team_id]").text();
-            localTeam = statsGame.select("[data-stat$=opp_id]").text();
-
-            visitant_team_id = teamService.getTeamByCode(visitantTeam);
-            local_team_id = teamService.getTeamByCode(localTeam);
-        }else {
-            localTeam = statsGame.select("[data-stat$=team_id]").text();
-            visitantTeam = statsGame.select("[data-stat$=opp_id]").text();
-
-            local_team_id = teamService.getTeamByCode(localTeam);
-            visitant_team_id = teamService.getTeamByCode(visitantTeam);
+            visitant_team_id = teamService.getTeamByCode(team_id);
+            local_team_id = teamService.getTeamByCode(opp_id);
+        } else {
+            local_team_id = teamService.getTeamByCode(team_id);
+            visitant_team_id = teamService.getTeamByCode(opp_id);
         }
 
 
-      /*  if (statsGame.select("[data-stat$=team_id]").text().equals("CHO")) {
-            team_id = teamService.getTeamByCode("CHA");
-            opp_id = teamService.getTeamByCode(statsGame.select("[data-stat$=opp_id]").text());
-        } else if (statsGame.select("[data-stat$=opp_id]").text().equals("CHO")) {
-            team_id = teamService.getTeamByCode(statsGame.select("[data-stat$=team_id]").text());
-            opp_id = teamService.getTeamByCode("CHA");
-        } else {
-            team_id = teamService.getTeamByCode(statsGame.select("[data-stat$=team_id]").text());
-            opp_id = teamService.getTeamByCode(statsGame.select("[data-stat$=opp_id]").text());
-        }*/
-
-        if(findByVisitantTeamIdAndLocalTeamIdAndDate(visitant_team_id, local_team_id, dateT) != null){
+        if (findByVisitantTeamIdAndLocalTeamIdAndDate(visitant_team_id, local_team_id, dateT) != null) {
             return findByVisitantTeamIdAndLocalTeamIdAndDate(visitant_team_id, local_team_id, dateT);
         }
 
@@ -85,6 +73,6 @@ public class GameService {
     }
 
     public Game findByVisitantTeamIdAndLocalTeamIdAndDate(Team team_visitant, Team team_local, Timestamp date) {
-        return repository.findByVisitantTeamIdAndLocalTeamIdAndDate(team_visitant, team_local,date);
+        return repository.findByVisitantTeamIdAndLocalTeamIdAndDate(team_visitant, team_local, date);
     }
 }

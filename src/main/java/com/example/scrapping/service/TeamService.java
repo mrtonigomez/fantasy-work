@@ -35,13 +35,29 @@ public class TeamService {
 
         if (url.split("/")[2].equals("NJN")) {
             team.setAbrv("BRK");
+            this.addTeam(team);
+            return;
         } else {
             team.setAbrv(url.split("/")[2]);
         }
 
+        if (url.split("/")[2].equals("CHA")) {
+            team.setAbrv("CHO");
+            this.addTeam(team);
+            return;
+        } else {
+            team.setAbrv(url.split("/")[2]);
+        }
+
+        if (url.split("/")[2].equals("NOH")) {
+            team.setAbrv("NOP");
+            this.addTeam(team);
+            return;
+        } else {
+            team.setAbrv(url.split("/")[2]);
+        }
 
         this.addTeam(team);
-
     }
 
     public Map<String, String> getBasicData(Document documentTeam) {

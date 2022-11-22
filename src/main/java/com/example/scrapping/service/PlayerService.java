@@ -1,25 +1,31 @@
 package com.example.scrapping.service;
 
 import com.example.scrapping.Helpers;
+import com.example.scrapping.dto.PlayerGetDto;
 import com.example.scrapping.models.Player;
 import com.example.scrapping.models.Team;
 import com.example.scrapping.repository.PlayerRepository;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class PlayerService {
 
     private final PlayerRepository repository;
     private final Helpers helper;
+    private final ModelMapper modelMapper;
 
-    public PlayerService(PlayerRepository repository, Helpers helper) {
+    public PlayerService(PlayerRepository repository, Helpers helper, ModelMapper modelMapper) {
         this.repository = repository;
         this.helper = helper;
+        this.modelMapper = modelMapper;
     }
 
     public Player insertOrGetPlayerData(String urlPlayer, Team team) {
@@ -101,6 +107,10 @@ public class PlayerService {
 
     public Player addPlayer(Player player) {
         return repository.save(player);
+    }
+
+    public List<PlayerGetDto> getPlayers() {
+        return repository.findAll().stream().map(player -> modelMapper.map(player, PlayerGetDto.class)).collect(Collectors.toList());
     }
 
 }

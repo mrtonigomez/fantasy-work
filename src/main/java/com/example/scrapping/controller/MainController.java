@@ -1,4 +1,4 @@
-package com.example.scrapping;
+package com.example.scrapping.controller;
 
 import com.example.scrapping.service.MainService;
 import org.jsoup.nodes.Document;

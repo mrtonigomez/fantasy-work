@@ -1,23 +1,28 @@
 package com.example.scrapping.service;
 
 import com.example.scrapping.Helpers;
+import com.example.scrapping.dto.TeamGetDto;
 import com.example.scrapping.models.Team;
 import com.example.scrapping.repository.TeamRepository;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class TeamService {
 
-    private TeamRepository repository;
+    private final TeamRepository repository;
+    private final ModelMapper modelMapper;
 
-    public TeamService(TeamRepository repository) {
+    public TeamService(TeamRepository repository, ModelMapper modelMapper) {
         this.repository = repository;
+        this.modelMapper = modelMapper;
     }
 
     public void createTeam(String url) {
@@ -65,6 +70,10 @@ public class TeamService {
 
     public List<Team> getAllTeams() {
         return repository.findAll();
+    }
+
+    public List<TeamGetDto> getAllTeamsDto() {
+        return repository.findAll().stream().map(team -> modelMapper.map(team, TeamGetDto.class)).collect(Collectors.toList());
     }
 
 }

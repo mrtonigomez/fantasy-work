@@ -9,6 +9,7 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -101,6 +102,10 @@ public class PlayerService {
 
     public Player addPlayer(Player player) {
         return repository.save(player);
+    }
+
+    public List<Player> getPlayersByTeam(Team team) {
+        return repository.findByTeam(team);
     }
 
 }

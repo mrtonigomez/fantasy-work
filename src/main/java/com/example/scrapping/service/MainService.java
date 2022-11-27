@@ -55,7 +55,7 @@ public class MainService {
             teamService.createTeam(documentTeam.attr("href"));
 
             System.out.println("Hola, esperando cinco segundos ...");
-            Thread.sleep(3000);
+            Thread.sleep(2000);
             System.out.println("Ya volví de esperar");
         }
 
@@ -63,32 +63,44 @@ public class MainService {
     }
 
     public void insertPlayerData(Team team) {
+
         String urlGetTeam = "https://www.basketball-reference.com/teams/" + team.getAbrv() + "/2023.html";
         Document documentTeam = helper.getHtmlDocument(urlGetTeam);
         Elements playersDocument = documentTeam.select("#roster > tbody >tr > td[data-stat$=player] > a");
 
-        playersDocument.forEach(playerDocument -> {
-            String urlPlayer = "https://www.basketball-reference.com" + playerDocument.attr("href");
-            Player player = playerService.insertOrGetPlayerData(urlPlayer, team);
+        if (playerService.getPlayersByTeam(team).size() !=  playersDocument.size()) {
+            playersDocument.forEach(playerDocument -> {
+                String urlPlayer = "https://www.basketball-reference.com" + playerDocument.attr("href");
+                Player player = playerService.insertOrGetPlayerData(urlPlayer, team);
 
-            String urlPlayerLatestStats = "https://www.basketball-reference.com" + playerDocument.attr("href").replace(".html", "") + "/gamelog/2023";
-            Document documentPlayer = helper.getHtmlDocument(urlPlayerLatestStats);
-            Elements stats = documentPlayer.select("#pgl_basic > tbody > tr");
+                String urlPlayerLatestStats = "https://www.basketball-reference.com" + playerDocument.attr("href").replace(".html", "") + "/gamelog/2023";
+                Document documentPlayer = helper.getHtmlDocument(urlPlayerLatestStats);
+                Elements stats = documentPlayer.select("#pgl_basic > tbody > tr");
 
-            try {
-                infoStatsService.recolectInfo(stats, player, teamService);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+                try {
+                    infoStatsService.recolectInfo(stats, player, teamService);
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
 
-            System.out.println("Hola, esperando cinco segundos ...");
-            try {
-                Thread.sleep(4000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println("Ya volví de esperar");
-        });
+
+                System.out.println("Hola, esperando tres segundos ...");
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                System.out.println("Ya volví de esperar");
+            });
+        }
+
+        System.out.println("Hola, esperando dos segundos ...");
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("Ya volví de esperar");
 
     }
 

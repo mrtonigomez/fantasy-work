@@ -27,37 +27,42 @@ public class GameService {
 
     public Game createGame(Element statsGame, TeamService teamService) throws ParseException {
 
-        Date date = new SimpleDateFormat("yyyy-MM-dd").parse(statsGame.select("[data-stat$=date_game]").text());
-        Timestamp dateT = new Timestamp(date.getTime());
-        String visitantTeam;
-        String localTeam;
-        String team_id;
-        String opp_id;
-        Team visitant_team_id;
-        Team local_team_id;
+        if (!statsGame.className().equals("thead")) {
+            Date date = new SimpleDateFormat("yyyy-MM-dd").parse(statsGame.select("[data-stat$=date_game]").text());
+            Timestamp dateT = new Timestamp(date.getTime());
+            String visitantTeam;
+            String localTeam;
+            String team_id;
+            String opp_id;
+            Team visitant_team_id;
+            Team local_team_id;
 
-        team_id = statsGame.select("[data-stat$=team_id]").text();
-        opp_id = statsGame.select("[data-stat$=opp_id]").text();
+            team_id = statsGame.select("[data-stat$=team_id]").text();
+            opp_id = statsGame.select("[data-stat$=opp_id]").text();
 
-        if (statsGame.select("[data-stat$=game_location]").text().equals("@")) {
-            visitant_team_id = teamService.getTeamByCode(team_id);
-            local_team_id = teamService.getTeamByCode(opp_id);
-        } else {
-            local_team_id = teamService.getTeamByCode(team_id);
-            visitant_team_id = teamService.getTeamByCode(opp_id);
+            if (statsGame.select("[data-stat$=game_location]").text().equals("@")) {
+                visitant_team_id = teamService.getTeamByCode(team_id);
+                local_team_id = teamService.getTeamByCode(opp_id);
+            } else {
+                local_team_id = teamService.getTeamByCode(team_id);
+                visitant_team_id = teamService.getTeamByCode(opp_id);
+            }
+
+
+            if (findByVisitantTeamIdAndLocalTeamIdAndDate(visitant_team_id, local_team_id, dateT) != null) {
+                return findByVisitantTeamIdAndLocalTeamIdAndDate(visitant_team_id, local_team_id, dateT);
+            }
+
+            Game game = new Game();
+
+            game.setLocalTeamId(local_team_id);
+            game.setVisitantTeamId(visitant_team_id);
+            game.setDate(dateT);
+            return this.insertGame(game);
+        }else {
+            return new Game();
         }
 
-
-        if (findByVisitantTeamIdAndLocalTeamIdAndDate(visitant_team_id, local_team_id, dateT) != null) {
-            return findByVisitantTeamIdAndLocalTeamIdAndDate(visitant_team_id, local_team_id, dateT);
-        }
-
-        Game game = new Game();
-
-        game.setLocalTeamId(local_team_id);
-        game.setVisitantTeamId(visitant_team_id);
-        game.setDate(dateT);
-        return this.insertGame(game);
     }
 
     public Game insertGame(Game game) {

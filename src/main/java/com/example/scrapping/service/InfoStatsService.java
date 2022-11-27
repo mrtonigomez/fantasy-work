@@ -24,7 +24,10 @@ public class InfoStatsService {
 
         for (Element statGame : statsGame) {
             Game game = gameService.createGame(statGame, teamService);
-            playerStatService.insertPlayerStatsData(statGame, player, game);
+
+            if (game.getId() != null) {
+                playerStatService.insertPlayerStatsData(statGame, player, game);
+            }
         }
 
     }

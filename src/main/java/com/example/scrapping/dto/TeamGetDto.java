@@ -26,6 +26,6 @@ public class TeamGetDto {
 
     private String championships;
 
-    private List<PlayerGetDto> players;
+    private List<PlayerForTeamDto> players;
 
 }

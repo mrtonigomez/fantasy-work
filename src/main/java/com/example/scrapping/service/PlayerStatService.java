@@ -89,7 +89,6 @@ public class PlayerStatService {
     public void addPlayerStat(PlayerStats playerStats) {
         repository.save(playerStats);
     }
-
     public void getPlayerStatBy(PlayerStats playerStats) {
         repository.save(playerStats);
     }

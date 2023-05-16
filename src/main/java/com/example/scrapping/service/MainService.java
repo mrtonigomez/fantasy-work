@@ -15,13 +15,14 @@ import java.util.List;
 @Service
 public class MainService {
 
-    public final String urlGetTeams = "https://www.basketball-reference.com/teams";
+    private final static String urlGetTeams = "https://www.basketball-reference.com/teams";
     private final PlayerService playerService;
     private final TeamService teamService;
     private final InfoStatsService infoStatsService;
     private final Helpers helper;
 
-    public MainService(PlayerService playerService, TeamService teamService, Helpers helper, InfoStatsService infoStatsService) {
+    public MainService(PlayerService playerService, TeamService teamService, Helpers helper,
+                       InfoStatsService infoStatsService) {
         this.playerService = playerService;
         this.teamService = teamService;
         this.infoStatsService = infoStatsService;
@@ -30,79 +31,20 @@ public class MainService {
 
     public void getInfo() throws InterruptedException {
         // Check if the request return 200 code
-        if (helper.getStatusConnectionCode(this.urlGetTeams) == 200) {
+        if (helper.getStatusConnectionCode(urlGetTeams) == 200) {
 
             List<Team> teams = teamService.getAllTeams();
 
             if (teams.isEmpty()) {
-                teams = this.insertTeamData();
+                teams = teamService.insertTeamData(urlGetTeams);
             }
 
             for (Team team : teams) {
-                this.insertPlayerData(team);
+                playerService.insertPlayerData(team, teamService, infoStatsService);
             }
 
         } else {
             System.out.println("El Status Code no es OK es: " + helper.getStatusConnectionCode(urlGetTeams));
         }
     }
-
-    public List<Team> insertTeamData() throws InterruptedException {
-        Document document = helper.getHtmlDocument(this.urlGetTeams);
-        Elements documentTeams = document.select("#teams_active > tbody >tr> th > a");
-
-        for (Element documentTeam : documentTeams) {
-            teamService.createTeam(documentTeam.attr("href"));
-
-            System.out.println("Hola, esperando cinco segundos ...");
-            Thread.sleep(2000);
-            System.out.println("Ya volví de esperar");
-        }
-
-        return teamService.getAllTeams();
-    }
-
-    public void insertPlayerData(Team team) {
-
-        String urlGetTeam = "https://www.basketball-reference.com/teams/" + team.getAbrv() + "/2023.html";
-        Document documentTeam = helper.getHtmlDocument(urlGetTeam);
-        Elements playersDocument = documentTeam.select("#roster > tbody >tr > td[data-stat$=player] > a");
-
-        if (playerService.getPlayersByTeam(team).size() !=  playersDocument.size()) {
-            playersDocument.forEach(playerDocument -> {
-                String urlPlayer = "https://www.basketball-reference.com" + playerDocument.attr("href");
-                Player player = playerService.insertOrGetPlayerData(urlPlayer, team);
-
-                String urlPlayerLatestStats = "https://www.basketball-reference.com" + playerDocument.attr("href").replace(".html", "") + "/gamelog/2023";
-                Document documentPlayer = helper.getHtmlDocument(urlPlayerLatestStats);
-                Elements stats = documentPlayer.select("#pgl_basic > tbody > tr");
-
-                try {
-                    infoStatsService.recolectInfo(stats, player, teamService);
-                } catch (ParseException e) {
-                    throw new RuntimeException(e);
-                }
-
-
-                System.out.println("Hola, esperando tres segundos ...");
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                System.out.println("Ya volví de esperar");
-            });
-        }
-
-        System.out.println("Hola, esperando dos segundos ...");
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        System.out.println("Ya volví de esperar");
-
-    }
-
-
 }

@@ -1,14 +1,19 @@
 package com.example.scrapping;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 
+@Slf4j
 public class Helpers {
 
-    public int getStatusConnectionCode(String url) {
+    private Helpers(){
+
+    }
+    public static int getStatusConnectionCode(String url) {
 
         Connection.Response response = null;
 
@@ -17,12 +22,12 @@ public class Helpers {
                     .ignoreContentType(true)
                     .userAgent("Mozilla/5.0").timeout(100000).ignoreHttpErrors(true).execute();
         } catch (IOException ex) {
-            System.out.println("Excepción al obtener el Status Code: " + ex.getMessage());
+            log.info("Excepción al obtener el Status Code: " + ex.getMessage());
         }
-        return response.statusCode();
+        return response != null ? response.statusCode() : 0;
     }
 
-    public Document getHtmlDocument(String url) {
+    public static Document getHtmlDocument(String url) {
 
         Document doc = null;
 
@@ -33,7 +38,6 @@ public class Helpers {
         }
 
         return doc;
-
     }
 
 }

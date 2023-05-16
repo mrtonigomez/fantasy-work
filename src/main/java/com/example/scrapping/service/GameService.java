@@ -19,7 +19,6 @@ public class GameService {
 
     protected final GameRepository repository;
     protected final Helpers helper;
-
     public GameService(GameRepository repository, Helpers helper) {
         this.repository = repository;
         this.helper = helper;
@@ -64,19 +63,15 @@ public class GameService {
         }
 
     }
-
     public Game insertGame(Game game) {
         return repository.save(game);
     }
-
     public Game getGameByDate(Timestamp date) {
         return repository.findByDate(date);
     }
-
     public Game getGameByVisitant(Timestamp date) {
         return repository.findByDate(date);
     }
-
     public Game findByVisitantTeamIdAndLocalTeamIdAndDate(Team team_visitant, Team team_local, Timestamp date) {
         return repository.findByVisitantTeamIdAndLocalTeamIdAndDate(team_visitant, team_local, date);
     }

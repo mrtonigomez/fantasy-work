@@ -4,6 +4,7 @@ import com.example.scrapping.Helpers;
 import com.example.scrapping.models.Game;
 import com.example.scrapping.models.Player;
 import com.example.scrapping.models.Team;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -13,25 +14,23 @@ import java.text.ParseException;
 import java.util.List;
 
 @Service
+@Slf4j
 public class MainService {
 
-    private final static String urlGetTeams = "https://www.basketball-reference.com/teams";
+    private static final String urlGetTeams = "https://www.basketball-reference.com/teams";
     private final PlayerService playerService;
     private final TeamService teamService;
     private final InfoStatsService infoStatsService;
-    private final Helpers helper;
 
-    public MainService(PlayerService playerService, TeamService teamService, Helpers helper,
-                       InfoStatsService infoStatsService) {
+    public MainService(PlayerService playerService, TeamService teamService, InfoStatsService infoStatsService) {
         this.playerService = playerService;
         this.teamService = teamService;
         this.infoStatsService = infoStatsService;
-        this.helper = helper;
     }
 
     public void getInfo() throws InterruptedException {
         // Check if the request return 200 code
-        if (helper.getStatusConnectionCode(urlGetTeams) == 200) {
+        if (Helpers.getStatusConnectionCode(urlGetTeams) == 200) {
 
             List<Team> teams = teamService.getAllTeams();
 
@@ -44,7 +43,7 @@ public class MainService {
             }
 
         } else {
-            System.out.println("El Status Code no es OK es: " + helper.getStatusConnectionCode(urlGetTeams));
+            log.info("El Status Code no es OK es: " + Helpers.getStatusConnectionCode(urlGetTeams));
         }
     }
 }

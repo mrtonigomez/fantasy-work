@@ -17,29 +17,29 @@ import java.util.List;
 @Slf4j
 public class MainService {
 
-    private static final String urlGetTeams = "https://www.basketball-reference.com/teams";
+    private String urlGetTeams = "https://www.basketball-reference.com/teams";
     private final PlayerService playerService;
     private final TeamService teamService;
-    private final InfoStatsService infoStatsService;
 
-    public MainService(PlayerService playerService, TeamService teamService, InfoStatsService infoStatsService) {
+    public MainService(PlayerService playerService, TeamService teamService) {
         this.playerService = playerService;
         this.teamService = teamService;
-        this.infoStatsService = infoStatsService;
     }
 
     public void getInfo() throws InterruptedException {
         // Check if the request return 200 code
         if (Helpers.getStatusConnectionCode(urlGetTeams) == 200) {
 
+            //Obtener los equipos
             List<Team> teams = teamService.getAllTeams();
 
-            if (teams.isEmpty()) {
+            if (teams.size() != 30) {
                 teams = teamService.insertTeamData(urlGetTeams);
             }
 
+            //Por cada equipo insertar sus jugadores
             for (Team team : teams) {
-                playerService.insertPlayerData(team, teamService, infoStatsService);
+                playerService.insertPlayerData(team, teamService);
             }
 
         } else {

@@ -1,41 +1,30 @@
 package com.example.scrapping.service;
 
-import com.example.scrapping.Helpers;
 import com.example.scrapping.models.Game;
 import com.example.scrapping.models.Player;
 import com.example.scrapping.models.PlayerStats;
-import com.example.scrapping.models.Team;
 import com.example.scrapping.repository.PlayerStatsRepository;
 import lombok.SneakyThrows;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
-
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @Service
 public class PlayerStatService {
 
     protected final PlayerStatsRepository repository;
-    protected final Helpers helper;
 
-    public PlayerStatService(PlayerStatsRepository repository, Helpers helper) {
+    public PlayerStatService(PlayerStatsRepository repository) {
         this.repository = repository;
-        this.helper = helper;
     }
 
     @SneakyThrows
     public void insertPlayerStatsData(Element statGame, Player player, Game game) {
         if (!statGame.select("[data-stat$=pts]").isEmpty()) {
 
-            if (this.findByPlayerAndGame(player, game) != null) {
+            if (findByPlayerAndGame(player, game) != null) {
                 return;
             }
-            this.createPlayerStat(statGame, player, game);
+            createPlayerStat(statGame, player, game);
 
         }
     }
@@ -63,9 +52,9 @@ public class PlayerStatService {
 
         playerStats.setPlayer(player);
         playerStats.setGame(game);
-        playerStats.setRating(this.calculateRating(playerStats));
+        playerStats.setRating(calculateRating(playerStats));
 
-        this.addPlayerStat(playerStats);
+        addPlayerStat(playerStats);
     }
 
     public Integer calculateRating(PlayerStats playerStat) {
@@ -74,16 +63,17 @@ public class PlayerStatService {
         int pointsWin = (playerStat.getFgm() * 2) + (playerStat.getAssists() * 2) + (playerStat.getRebounds() * 2) +
                 (playerStat.getBlocks()) + (playerStat.getSteals()) + (playerStat.getFtm());
 
-        int pointsLose = ((playerStat.getFga() - playerStat.getFgm()) * 2) + (playerStat.getFoults()) +
+        int pointsLose = ((playerStat.getFga() - playerStat.getFgm())) +
                 (playerStat.getTurnovers()) + (playerStat.getFta() - playerStat.getFtm());
 
         rating = pointsWin - pointsLose;
 
-        if (rating <= 5) {
+        /*if (rating <= 5) {
             return 5;
         }
 
-        return rating;
+        return rating;*/
+        return Math.max(rating, 5);
     }
 
     public void addPlayerStat(PlayerStats playerStats) {
